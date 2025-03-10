@@ -1,0 +1,93 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+
+# Importar los datos y establecer la columna 'date' como índice
+df = pd.read_csv("fcc-forum-pageviews.csv", parse_dates=["date"], index_col="date")
+
+# Limpiar los datos eliminando el 2.5% superior e inferior
+low_quantile = df["value"].quantile(0.025)
+high_quantile = df["value"].quantile(0.975)
+df = df[(df["value"] >= low_quantile) & (df["value"] <= high_quantile)]
+
+
+def draw_line_plot():
+    """
+    Dibuja un gráfico de líneas que muestra la evolución de las visitas diarias al foro.
+    """
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.plot(df.index, df["value"], color="red", linewidth=1)
+
+    # Etiquetas y título
+    ax.set_title("Daily freeCodeCamp Forum Page Views 5/2016-12/2019")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Page Views")
+
+    # Guardar imagen
+    fig.savefig("line_plot.png")
+    return fig
+
+
+def draw_bar_plot():
+    """
+    Dibuja un gráfico de barras que muestra el promedio de visitas diarias por mes y año.
+    """
+    # Crear DataFrame para el gráfico de barras
+    df_bar = df.copy()
+    df_bar["Year"] = df_bar.index.year
+    df_bar["Month"] = df_bar.index.month
+
+    # Agrupar por año y mes y calcular la media
+    df_bar = df_bar.groupby(["Year", "Month"])["value"].mean().unstack()
+
+    # Crear la figura y el gráfico
+    fig = df_bar.plot(kind="bar", figsize=(12, 6)).figure
+
+    # Configurar etiquetas
+    plt.xlabel("Years")
+    plt.ylabel("Average Page Views")
+    plt.legend(title="Months", labels=["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"])
+
+    # Guardar imagen
+    fig.savefig("bar_plot.png")
+    return fig
+
+
+def draw_box_plot():
+    """
+    Dibuja dos diagramas de caja que muestran la distribución de visitas por año y mes.
+    """
+    df_box = df.copy()
+    df_box["Year"] = df_box.index.year
+    df_box["Month"] = df_box.index.strftime("%b")
+
+    # Orden de los meses
+    months_order = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+    # Crear la figura y los ejes
+    fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+
+    # Diagrama de caja por año
+    sns.boxplot(x="Year", y="value", data=df_box, ax=axes[0])
+    axes[0].set_title("Year-wise Box Plot (Trend)")
+    axes[0].set_xlabel("Year")
+    axes[0].set_ylabel("Page Views")
+
+    # Diagrama de caja por mes
+    sns.boxplot(x="Month", y="value", data=df_box, order=months_order, ax=axes[1])
+    axes[1].set_title("Month-wise Box Plot (Seasonality)")
+    axes[1].set_xlabel("Month")
+    axes[1].set_ylabel("Page Views")
+
+    # Guardar imagen
+    fig.savefig("box_plot.png")
+    return fig
+
+
+if __name__ == "__main__":
+    draw_line_plot()
+    draw_bar_plot()
+    draw_box_plot()
