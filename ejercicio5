@@ -1,0 +1,40 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import scipy.stats as stats
+
+def draw_plot():
+    # Importar los datos
+    df = pd.read_csv("epa-sea-level.csv")
+
+    # Crear la figura
+    fig, ax = plt.subplots(figsize=(10, 5))
+
+    # Gráfico de dispersión
+    ax.scatter(df["Year"], df["CSIRO Adjusted Sea Level"], label="Datos originales")
+
+    # Línea de mejor ajuste para todos los datos
+    slope1, intercept1, _, _, _ = stats.linregress(df["Year"], df["CSIRO Adjusted Sea Level"])
+    x_pred1 = range(1880, 2051)
+    y_pred1 = [slope1 * x + intercept1 for x in x_pred1]
+    ax.plot(x_pred1, y_pred1, "r", label="Tendencia 1880-2050")
+
+    # Línea de mejor ajuste desde el año 2000
+    df_recent = df[df["Year"] >= 2000]
+    slope2, intercept2, _, _, _ = stats.linregress(df_recent["Year"], df_recent["CSIRO Adjusted Sea Level"])
+    x_pred2 = range(2000, 2051)
+    y_pred2 = [slope2 * x + intercept2 for x in x_pred2]
+    ax.plot(x_pred2, y_pred2, "g", label="Tendencia 2000-2050")
+
+    # Etiquetas y título
+    ax.set_xlabel("Year")
+    ax.set_ylabel("Sea Level (inches)")
+    ax.set_title("Rise in Sea Level")
+    ax.legend()
+
+    # Guardar la imagen
+    plt.savefig("sea_level_plot.png")
+    return fig
+
+# Ejecutar la función al correr el script
+if __name__ == "__main__":
+    draw_plot()
