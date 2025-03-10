@@ -1,0 +1,85 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Importar los datos del archivo
+df = pd.read_csv("medical_examination.csv")
+
+# 1. Añadir la columna 'overweight'
+# Convertir la altura de cm a m y calcular el BMI
+df['overweight'] = (df['weight'] / ((df['height'] / 100) ** 2) > 25).astype(int)
+
+# 2. Normalizar los datos de 'cholesterol' y 'gluc'
+# Si el valor es 1 (bueno) se convierte a 0, y si es mayor que 1 (malo) se convierte a 1.
+df['cholesterol'] = (df['cholesterol'] > 1).astype(int)
+df['gluc'] = (df['gluc'] > 1).astype(int)
+
+
+def draw_cat_plot():
+    """
+    Crea un gráfico categórico que muestra los recuentos de los resultados
+    buenos y malos para las variables: cholesterol, gluc, smoke, alco, active y overweight,
+    separados por la presencia de enfermedad cardiovascular (cardio).
+    """
+    # 3. Crear DataFrame para el gráfico usando pd.melt
+    df_cat = pd.melt(df, id_vars=["cardio"], 
+                     value_vars=["cholesterol", "gluc", "smoke", "alco", "active", "overweight"])
+
+    # 4. Agrupar y reformatear los datos para contar cada ocurrencia
+    df_cat = df_cat.value_counts().reset_index(name="total")
+    # Opcional: ordenar para mayor claridad (no afecta el gráfico)
+    df_cat = df_cat.sort_values(["cardio", "variable", "value"])
+
+    # 5. Crear el gráfico de barras usando seaborn.catplot
+    fig = sns.catplot(data=df_cat, x="variable", y="total", hue="value",
+                      col="cardio", kind="bar").fig
+
+    # No modifiques las siguientes dos líneas
+    fig.savefig('catplot.png')
+    return fig
+
+
+def draw_heat_map():
+    """
+    Crea un mapa de calor a partir de la matriz de correlación de los datos
+    limpios. Se filtran registros erróneos:
+        - Filtrar registros donde la presión diastólica es mayor que la sistólica.
+        - Filtrar valores de altura y peso fuera del rango [2.5%, 97.5%].
+    """
+    # 6. Limpiar los datos
+    # a) Mantener solo registros donde ap_lo <= ap_hi
+    df_heat = df[df["ap_lo"] <= df["ap_hi"]].copy()
+
+    # b) Eliminar los outliers de la altura
+    height_low = df_heat['height'].quantile(0.025)
+    height_high = df_heat['height'].quantile(0.975)
+    df_heat = df_heat[(df_heat['height'] >= height_low) & (df_heat['height'] <= height_high)]
+
+    # c) Eliminar los outliers del peso
+    weight_low = df_heat['weight'].quantile(0.025)
+    weight_high = df_heat['weight'].quantile(0.975)
+    df_heat = df_heat[(df_heat['weight'] >= weight_low) & (df_heat['weight'] <= weight_high)]
+
+    # 7. Calcular la matriz de correlación
+    corr = df_heat.corr()
+
+    # 8. Generar una máscara para el triángulo superior
+    mask = np.triu(np.ones(corr.shape), k=1)
+
+    # 9. Configurar la figura de matplotlib
+    fig, ax = plt.subplots(figsize=(12, 10))
+
+    # 10. Dibujar el mapa de calor usando seaborn.heatmap()
+    sns.heatmap(corr, mask=mask, annot=True, fmt=".1f", square=True, center=0,
+                cbar_kws={"shrink": 0.5}, ax=ax)
+
+    # No modifiques las siguientes dos líneas
+    fig.savefig('heatmap.png')
+    return fig
+
+
+if __name__ == '__main__':
+    # Generar y guardar los gráficos
+    draw_cat_plot()
+    draw_heat_map()
