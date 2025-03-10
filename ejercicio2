@@ -62,15 +62,15 @@ def analyze_demographic_data():
     
     # Imprimir los resultados claramente
     print("\n--- Resultados del Análisis Demográfico ---\n")
-    print(f"1️⃣ Número de personas por raza:\n{race_count}\n")
-    print(f"2️⃣ Edad media de los hombres: {average_age_men} años\n")
-    print(f"3️⃣ Porcentaje de personas con licenciatura: {percentage_bachelors}%\n")
-    print(f"4️⃣ Porcentaje de personas con educación avanzada que ganan >50K: {higher_education_rich}%\n")
-    print(f"5️⃣ Porcentaje de personas sin educación avanzada que ganan >50K: {lower_education_rich}%\n")
-    print(f"6️⃣ Número mínimo de horas trabajadas por semana: {min_work_hours} horas\n")
-    print(f"7️⃣ Porcentaje de personas que trabajan el mínimo de horas semanales y ganan >50K: {rich_percentage}%\n")
-    print(f"8️⃣ País con el mayor porcentaje de personas que ganan >50K: {highest_earning_country} ({highest_earning_country_percentage}%)\n")
-    print(f"9️⃣ Ocupación más común en India para quienes ganan >50K: {top_IN_occupation}\n")
+    print(f"Número de personas por raza:\n{race_count}\n")
+    print(f"Edad media de los hombres: {average_age_men} años\n")
+    print(f"Porcentaje de personas con licenciatura: {percentage_bachelors}%\n")
+    print(f"Porcentaje de personas con educación avanzada que ganan >50K: {higher_education_rich}%\n")
+    print(f"Porcentaje de personas sin educación avanzada que ganan >50K: {lower_education_rich}%\n")
+    print(f"Número mínimo de horas trabajadas por semana: {min_work_hours} horas\n")
+    print(f"Porcentaje de personas que trabajan el mínimo de horas semanales y ganan >50K: {rich_percentage}%\n")
+    print(f"País con el mayor porcentaje de personas que ganan >50K: {highest_earning_country} ({highest_earning_country_percentage}%)\n")
+    print(f"Ocupación más común en India para quienes ganan >50K: {top_IN_occupation}\n")
 
 if __name__ == "__main__":
     try:
